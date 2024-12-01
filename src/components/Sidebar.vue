@@ -52,6 +52,8 @@
 </template>
 
 <script>
+import axios from 'axios'; // Import Axios for making HTTP requests
+
 export default {
   name: "Sidebar",
   data() {
@@ -66,21 +68,27 @@ export default {
       this.isCollapsed = !this.isCollapsed; 
     },
     confirmLogout() {
-
       this.showDialog = true;
     },
     closeDialog() {
-     
       this.showDialog = false;
     },
     logout() {
-   
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      localStorage.removeItem("userFullName");  
+      // Make an Axios request to the PHP logout script
+      axios.get('/logout.php') 
+        .then(response => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          localStorage.removeItem("userFullName");
 
-      this.$router.push({ name: 'Login' });
-      this.showDialog = false;
+          // Redirect to login page
+          this.$router.push({ name: 'Login' });
+          this.showDialog = false;
+        })
+        .catch(error => {
+          console.error('Logout failed:', error);
+          // Handle error if needed
+        });
     },
     updateView() {
       this.isPhoneView = window.innerWidth <= 768;

@@ -67,7 +67,7 @@ export default {
   methods: {
     async submitForm() {
       try {
-        // Send login request to the backend
+      
         const response = await axios.post('http://localhost/CheckEaseExp-NEW/vue-login-backend/login.php', {
           email: this.email,
           password: this.password,
@@ -76,7 +76,6 @@ export default {
         const result = response.data;
 
         if (result.success) {
-          // Store the JWT token and user details in localStorage
           localStorage.setItem('token', result.token);
           localStorage.setItem('role', result.role);
           localStorage.setItem('firstname', result.firstname);
@@ -99,11 +98,10 @@ export default {
               this.$router.push({ name: 'Home' });
             } else if (decodedToken.data.role === 'student') {
               this.$router.push({ name: 'StudentHome' });
-            } else {
-              console.warn('Role not recognized or no redirect path specified.');
             }
           } else {
             this.errorMessage = 'Your session has expired. Please log in again.';
+            this.logout(); 
           }
         } else {
           this.errorMessage =
@@ -114,7 +112,6 @@ export default {
         this.errorMessage = 'Something went wrong, please try again.';
       }
     },
-
     decodeJWT(token) {
       try {
         const base64Url = token.split('.')[1];
@@ -126,10 +123,43 @@ export default {
         return null;
       }
     },
+    logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      localStorage.removeItem('firstname');
+      localStorage.removeItem('lastname');
+      localStorage.removeItem('email');
+      localStorage.removeItem('userFullName');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userFirstName');
+      localStorage.removeItem('userLastName');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userRole');
+      this.$router.push({ name: 'Login' });
+    }
+  },
+
+  mounted() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = this.decodeJWT(token);
+      if (decodedToken && decodedToken.exp > Math.floor(Date.now() / 1000)) {
+        this.user = decodedToken.data;
+
+        if (this.user.role === 'teacher') {
+          this.$router.push({ name: 'Home' });
+        } else if (this.user.role === 'student') {
+          this.$router.push({ name: 'StudentHome' });
+        }
+      } else {
+        this.logout();
+      }
+    } else {
+      this.$router.push({ name: 'Login' });
+    }
   },
 };
 </script>
-
 
 
 <style scoped>

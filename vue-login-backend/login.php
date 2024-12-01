@@ -12,6 +12,12 @@ if (!$secret_key) {
     exit;
 }
 
+// Check if the user is already authenticated
+if (isset($_SESSION['jwt'])) {
+    echo json_encode(['success' => true, 'message' => 'User already logged in.', 'token' => $_SESSION['jwt']]);
+    exit;
+}
+
 $data = json_decode(file_get_contents("php://input"));
 
 if (!isset($data->email) || !isset($data->password)) {
@@ -33,7 +39,7 @@ try {
                 "iss" => "http://localhost/CheckEaseExp-NEW/vue-login-backend/login.php", 
                 "aud" => "http://localhost/CheckEaseExp-NEW/vue-login-backend/login.php", 
                 "iat" => time(),
-                "exp" => time() + (60 * 60 * 24), 
+                "exp" => time() + (60 * 60 * 24),  
                 "data" => [
                     "id" => $user['id'], 
                     "firstname" => $user['firstname'],
@@ -43,10 +49,8 @@ try {
                 ]
             ];
 
-            // Encode JWT
             $jwt = JWT::encode($payload, $secret_key, 'HS256');
             $_SESSION['jwt'] = $jwt;
-
             $updateStmt = $pdo->prepare("UPDATE users SET token = :token WHERE email = :email");
             $updateResult = $updateStmt->execute(['token' => $jwt, 'email' => $email]);
 

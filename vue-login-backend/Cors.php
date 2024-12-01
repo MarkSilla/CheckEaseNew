@@ -6,6 +6,9 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-W
 header("Access-Control-Expose-Headers: Content-Length, X-Knowledge-Base-API-Key");
 header("Access-Control-Max-Age: 3600"); 
 header("Access-Control-Allow-Credentials: true");
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {

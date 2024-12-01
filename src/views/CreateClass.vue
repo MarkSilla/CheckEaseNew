@@ -72,7 +72,7 @@ export default {
       capacity: '',
       classes: [], // List of classes
       capacityError: '',
-      token: localStorage.getItem('token') || '', // Token from localStorage
+      token: localStorage.getItem('token') || '', 
       isLoading: false,
     };
   },
@@ -84,7 +84,7 @@ export default {
       ElNotification({
         type,
         message,
-        duration: 3000, // Notification duration in milliseconds
+        duration: 3000, 
       });
     },
 
@@ -103,7 +103,7 @@ export default {
      * Fetch classes from the backend
      */
     async fetchClasses() {
-      this.loadClassesFromLocalStorage(); // Load cached classes first
+      this.loadClassesFromLocalStorage(); 
 
       if (!this.token) {
         this.showNotification('error', 'You must be logged in to view classes');
@@ -113,17 +113,16 @@ export default {
       try {
         const response = await api.get('/fetchClasses.php', {
           headers: {
-            Authorization: `Bearer ${this.token}`, // Send the token for authorization
+            Authorization: `Bearer ${this.token}`, 
           },
         });
 
         if (response.data.success) {
-          this.classes = response.data.classes;  // After fetching from the backend
-          localStorage.setItem('classes', JSON.stringify(this.classes));  // Store in localStorage  
+          this.classes = response.data.classes;  
+          localStorage.setItem('classes', JSON.stringify(this.classes)); 
           console.log('Classes fetched from server:', this.classes);
         } else {
           this.showNotification('error', response.data.error || 'Failed to fetch classes');
-          // Optional: Logout user if token is invalid/expired
           if (response.data.error === 'Invalid or expired token') {
             this.logout();
           }
@@ -209,7 +208,7 @@ export default {
   },
   created() {
     this.loadClassesFromLocalStorage();
-    this.fetchClasses(); // Load classes when component is created
+    this.fetchClasses(); 
   },
 };
 </script>

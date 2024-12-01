@@ -105,6 +105,8 @@
 </template>
 
 <script>
+import axios from 'axios'; 
+
 export default {
   data() {
     return {
@@ -121,35 +123,54 @@ export default {
     console.log(localStorage.getItem('email'));
     window.addEventListener('resize', this.handleResize);
   },
+
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
   },
+
   methods: {
     toggleSidebar() {
       this.isSidebarHidden = !this.isSidebarHidden;  
     },
+
     confirmLogout() {
       this.showDialog = true;
     },
+
     closeDialog() {
       this.showDialog = false;
     },
+
     logout() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      this.$router.push("/Login");
-      this.showDialog = false; 
+      
+      axios.get('/logout.php') 
+        .then(response => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          localStorage.removeItem("firstname");
+          localStorage.removeItem("lastname");
+          localStorage.removeItem("email");
+
+          this.$router.push("/Login");
+          this.showDialog = false; 
+        })
+        .catch(error => {
+          console.error('Logout failed:', error);
+        });
     },
 
     toggleAttendanceDropdown() {
       this.isAttendanceDropdownOpen = !this.isAttendanceDropdownOpen;
     },
+
     handleResize() {
       this.isSidebarHidden = window.innerWidth < 768;
     },
+
     isActive(route) {
       return this.$route.path === route;
     },
+
     loadUserInfo() {
       const firstName = localStorage.getItem('firstname') || 'Guest';
       const lastName = localStorage.getItem('lastname') || '';
@@ -159,7 +180,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .dialog-overlay {
