@@ -30,7 +30,7 @@
             <h1 class="text-center mt-4"><b>Sign up</b></h1>
             <p class="text-center text-secondary">
               Already have an account?
-              <router-link to="/login" class="text-decoration-none">Log in!</router-link>
+              <router-link to="/login" class="text-decoration-none">Log in</router-link>
             </p>
 
             <form @submit.prevent="submitForm" class="px-3 py-2">
@@ -117,29 +117,24 @@ export default {
     window.removeEventListener('resize', this.checkScreenSize);
   },
   methods: {
-    // Check if screen size is larger than 768px for displaying info section
     checkScreenSize() {
       this.showInfoSection = window.innerWidth >= 768;
     },
 
-    // Validate the form before submission
     validateForm() {
       const nameRegex = /^[A-Za-z\s]+$/;  
       this.nameError = ''; 
 
-      // First and Last name validation
       if (!this.firstname || !this.lastname || !this.email || !this.password || !this.confirmPassword || !this.role) {
         alert('Please fill in all fields.');
         return false;
       }
 
-      // Name format validation (letters and spaces only)
       if (!nameRegex.test(this.firstname) || !nameRegex.test(this.lastname)) {
-        this.nameError = 'First and last name can only contain letters and spaces.';
+        this.nameError = 'First and last name can only contain letters.';
         return false;
       }
 
-      // Password mismatch check
       if (this.password !== this.confirmPassword) {
         this.passwordMismatch = true;
         alert('Passwords do not match.');
@@ -148,8 +143,6 @@ export default {
 
       return true;
     },
-
-    // Submit the form data
     async submitForm() {
       if (!this.validateForm()) {
         return;

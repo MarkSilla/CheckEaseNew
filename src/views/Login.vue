@@ -16,7 +16,7 @@
           <h2 class="text-center"><b>Log in to your Account</b></h2>
           <p class="text-secondary text-center mb-4">
             New to Check Ease?
-            <router-link to="/signup" class="text-decoration-none">Sign up!</router-link>
+            <router-link to="/signup" class="text-decoration-none">Sign up</router-link>
           </p>
 
           <!-- Email Input -->
@@ -76,17 +76,19 @@ export default {
         const result = response.data;
 
         if (result.success) {
+          // Store the JWT token and user details in localStorage
           localStorage.setItem('token', result.token);
           localStorage.setItem('role', result.role);
           localStorage.setItem('firstname', result.firstname);
           localStorage.setItem('lastname', result.lastname);
           localStorage.setItem('email', result.email);
+          
           const fullName = `${result.firstname} ${result.lastname}`;
           localStorage.setItem('userFullName', fullName);
+
           const decodedToken = this.decodeJWT(result.token);
 
           if (decodedToken && decodedToken.exp > Math.floor(Date.now() / 1000)) {
-  
             localStorage.setItem('userId', decodedToken.data.id);
             localStorage.setItem('userFirstName', decodedToken.data.firstname);
             localStorage.setItem('userLastName', decodedToken.data.lastname);
@@ -98,7 +100,7 @@ export default {
             } else if (decodedToken.data.role === 'student') {
               this.$router.push({ name: 'StudentHome' });
             } else {
-              console.warn('No role or redirect path specified in response.');
+              console.warn('Role not recognized or no redirect path specified.');
             }
           } else {
             this.errorMessage = 'Your session has expired. Please log in again.';
