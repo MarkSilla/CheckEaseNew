@@ -46,7 +46,9 @@
               <small><strong>Class Code: </strong>{{classItem.class_code }}</small>
             </div>
             <div>
-              <button class="btn btn-info btn-sm">View</button>
+              <button @click="editClass(classItem)" class="btn btn-primary btn-sm mx-2"><b>Edit</b></button>
+              <button @click="deleteClass(classItem)" class="btn btn-danger btn-sm"><b>Delete</b></button>
+
             </div>
           </div>
         </div>
@@ -70,16 +72,13 @@ export default {
     return {
       className: '',
       capacity: '',
-      classes: [], // List of classes
+      classes: [],  
       capacityError: '',
       token: localStorage.getItem('token') || '', 
       isLoading: false,
     };
   },
   methods: {
-    /**
-     * Show notifications using Element Plus
-     */
     showNotification(type, message) {
       ElNotification({
         type,
@@ -88,22 +87,22 @@ export default {
       });
     },
 
-    /**
-     * Load classes from localStorage
-     */
     loadClassesFromLocalStorage() {
       const storedClasses = localStorage.getItem('classes');
       if (storedClasses) {
-        this.classes = JSON.parse(storedClasses);
+        this.classes = JSON.parse(storedClasses); 
         console.log('Loaded classes from localStorage:', this.classes);
       }
     },
+    
+    removeClassFromLocalStorage(classCode) {
+      const storedClasses = JSON.parse(localStorage.getItem('classes')) || [];
+      const updatedClasses = storedClasses.filter(classItem => classItem.class_code !== classCode);
+      localStorage.setItem('classes', JSON.stringify(updatedClasses)); // Update localStorage
+    },
 
-    /**
-     * Fetch classes from the backend
-     */
     async fetchClasses() {
-      this.loadClassesFromLocalStorage(); 
+      this.loadClassesFromLocalStorage();
 
       if (!this.token) {
         this.showNotification('error', 'You must be logged in to view classes');
@@ -113,12 +112,12 @@ export default {
       try {
         const response = await api.get('/fetchClasses.php', {
           headers: {
-            Authorization: `Bearer ${this.token}`, 
+            Authorization: `Bearer ${this.token}`,
           },
         });
 
         if (response.data.success) {
-          this.classes = response.data.classes;  
+          this.classes = response.data.classes;
           localStorage.setItem('classes', JSON.stringify(this.classes)); 
           console.log('Classes fetched from server:', this.classes);
         } else {
@@ -132,10 +131,7 @@ export default {
         this.showNotification('error', 'An error occurred while fetching classes');
       }
     },
-
-    /**
-     * Create a new class
-     */
+    
     async createClass() {
       this.capacityError = '';
 
@@ -164,7 +160,7 @@ export default {
           },
           {
             headers: {
-              Authorization: `Bearer ${this.token}`, 
+              Authorization: `Bearer ${this.token}`,
             },
           }
         );
@@ -173,15 +169,14 @@ export default {
           const newClass = {
             class_name: this.className,
             capacity: this.capacity,
-            class_code: response.data.class_code,
+            class_code: response.data.class_code, 
           };
-
-          this.classes.push(newClass); 
-          localStorage.setItem('classes', JSON.stringify(this.classes)); 
+          this.classes.push(newClass);
+          localStorage.setItem('classes', JSON.stringify(this.classes));
           console.log('Class created and saved to localStorage:', newClass);
 
           this.showNotification('success', 'Class created successfully!');
-          this.className = '';
+          this.className = ''; 
           this.capacity = ''; 
         } else {
           this.showNotification('error', response.data.error || 'Failed to create class');
@@ -193,30 +188,47 @@ export default {
         this.isLoading = false;
       }
     },
+    
+    async deleteClass(classItem) {
+      console.log('Deleting class:', classItem); // Debugging log
+      if (!this.token) {
+        this.showNotification('error', 'You must be logged in to delete classes');
+        return;
+      }
 
-    /**
-     * Logout the user by clearing the token and class data
-     */
-    logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('classes');
-      this.token = '';
-      this.classes = [];
-      this.showNotification('info', 'You have been logged out due to an invalid or expired token.');
-      console.log('Logged out successfully.');
+      const classCode = classItem.class_code || classItem.id; // Use class_code or id as identifier
+      
+      try {
+        // Make sure to send the correct class identifier
+        const response = await api.delete(`/delete.php?class_code=${classCode}`, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        });
+
+        if (response.data.success) {
+          this.removeClassFromLocalStorage(classCode);
+          this.classes = this.classes.filter((classItem) => classItem.class_code !== classCode); 
+          localStorage.setItem('classes', JSON.stringify(this.classes));
+          this.showNotification('success', 'Class deleted successfully');
+        } else {
+          this.showNotification('error', response.data.error || 'Failed to delete class');
+        }
+      } catch (error) {
+        console.error('Error deleting class:', error);
+        this.showNotification('error', 'An error occurred while deleting the class');
+      }
     },
   },
-  created() {
+  mounted() {
     this.loadClassesFromLocalStorage();
     this.fetchClasses(); 
-  },
+  }
 };
 </script>
 
 
-
 <style scoped>
-
 .card {
   border-radius: 20px; 
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); 

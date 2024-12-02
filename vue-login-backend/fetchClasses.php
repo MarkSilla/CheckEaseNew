@@ -2,7 +2,7 @@
 require __DIR__ . '/vendor/autoload.php';
 include 'Cors.php';
 require 'db.php';
-require 'validate.php'; // Include the validate.php for JWT validation
+require 'validate.php'; 
 
 session_start();
 
@@ -42,12 +42,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Return the classes in a JSON response
-        if ($classes) {
-            echo json_encode(['success' => true, 'classes' => $classes]);
-        } else {
-            echo json_encode(['success' => false, 'error' => 'No classes found']);
-        }
+        
+
+            if ($classes) {
+                echo json_encode(['success' => true, 'classes' => $classes]);
+            } else {
+                echo json_encode(['success' => true, 'classes' => []]); 
+            }
+
     } catch (PDOException $e) {
         // Detailed error message in case of DB issues
         echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
