@@ -35,7 +35,7 @@
         cards: [
           {
             title: "BSIT-2A",
-            button: { text: "View Attendance", link: "/attendance" }, // Updated link
+            button: { text: "View Attendance", link: "/attendance" }, 
           },
           {
             title: "BSIT-2B",

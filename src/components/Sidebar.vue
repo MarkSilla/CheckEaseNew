@@ -231,7 +231,6 @@ export default {
   font-size: 30px;
 }
 
-/* Responsive Adjustments */
 @media (max-width: 576px) {
   #sidebar {
     width: 60px;
