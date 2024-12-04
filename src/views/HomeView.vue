@@ -84,7 +84,11 @@ export default {
     async fetchClassCount() {
       try {
         const token = localStorage.getItem('token'); 
+<<<<<<< HEAD
         const response = await axios.get('http://localhost/CheckEaseNEW-main/vue-login-backend/classCount.php', {
+=======
+        const response = await axios.get('http://localhost/CheckEaseExp-NEW/vue-login-backend/classCount.php', {
+>>>>>>> origin/main
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -68,7 +68,11 @@ export default {
     async submitForm() {
       try {
       
+<<<<<<< HEAD
         const response = await axios.post('http://localhost/CheckEaseNEW-main/vue-login-backend/login.php', {
+=======
+        const response = await axios.post('http://localhost/CheckEaseExp-NEW/vue-login-backend/login.php', {
+>>>>>>> origin/main
           email: this.email,
           password: this.password,
         });

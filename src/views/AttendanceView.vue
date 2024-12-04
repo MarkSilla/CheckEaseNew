@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div class="container position-flex offset-md-2" style="margin-top: 20px">
     <!-- Check if classes are loaded -->
     <div v-if="classes.length > 0" class="row">
@@ -31,10 +32,35 @@
             >
               <u>Take Attendance</u>
             </router-link>
+=======
+    <div class="container position-flex offset-md-2" style="margin-top: px">
+      <div class="row">
+        <div
+          class="col-12 col-sm-6 col-md-5 col-lg-4 mb-2"
+          v-for="(card, index) in cards"
+          :key="index"
+        >
+          <div class="card custom-card shadow-sm d-flex flex-column align-items-center justify-content-center" style="width: 340px; height: 200px;">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+              <div class="card-content text-center mb-3">
+                <h5 class="card-title"><b>{{ card.title }}</b></h5>
+                <p class="card-text" v-html="card.text"></p>
+              </div>
+              <router-link
+                :to="{ path: '/ViewStudentAttendance' }"
+                class="btn custom-btn"
+              > <u>View Attendance</u> </router-link>
+              <router-link
+                :to="{ path: '/attendancerecord' }"
+                class="btn custom-btn"
+              ><u>Take Attendance</u> </router-link>
+            </div>
+>>>>>>> origin/main
           </div>
         </div>
       </div>
     </div>
+<<<<<<< HEAD
 
     <!-- If no classes are found in localStorage -->
     <div v-else class="text-center">
@@ -117,6 +143,86 @@ export default {
   font-size: 2.5rem; /* Adjust this value as needed */
   font-weight: bold;
 }
+=======
+  </template>
+  
+  <script>
+  export default {
+    name: "AttendanceRecord",
+    data() {
+      return {
+        cards: [
+          {
+            title: "BSIT-2A",
+            button: { text: "View Attendance", link: "/attendance" }, 
+          },
+          {
+            title: "BSIT-2B",
+            button: { text: "View Attendance", link: "/attendance" },
+          },
+          {
+            title: "BSIT-2C",
+            button: { text: "View Attendance", link: "/attendance" },
+          },
+          {
+            title: "BSIT-2D",
+            button: { text: "View Attendance", link: "/attendance" },
+          },
+          {
+            title: "BSIT-2E",
+            button: { text: "View Attendance", link: "/attendance" },
+          },
+          {
+            title: "BSIT-2F",
+            button: { text: "View Attendance", link: "/attendance" },
+          }
+        ],
+      };
+    },
+    methods: {
+      handleResize() {
+        const width = window.innerWidth;
+        const container = document.querySelector('.container');
+        const cards = document.querySelectorAll('.custom-card');
+  
+        if (width <= 576) { // Mobile
+          container.style.padding = '10px';
+          cards.forEach(card => {
+            card.style.width = '85%';
+            card.style.height = '150px';
+            card.style.margin = '10px auto';
+          });
+        } else if (width <= 768) { // Tablet
+          container.style.padding = '15px';
+          cards.forEach(card => {
+            card.style.width = '90%';
+            card.style.height = '180px';
+            card.style.margin = '12px auto';
+          });
+        } else { // Desktop
+          container.style.padding = '20px';
+          cards.forEach(card => {
+            card.style.width = '340px';
+            card.style.height = '200px';
+            card.style.margin = '15px';
+          });
+        }
+      }
+    },
+  
+    mounted() {
+      this.handleResize();
+      window.addEventListener('resize', this.handleResize);
+    },
+  
+    beforeDestroy() {
+      window.removeEventListener('resize', this.handleResize);
+    }
+  };
+  </script>
+  
+  <style scoped>
+>>>>>>> origin/main
   .custom-btn {
     margin-top: 5px;
   }

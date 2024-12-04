@@ -167,7 +167,11 @@ export default {
       }
 
       try {
+<<<<<<< HEAD
         const response = await axios.post('http://localhost/CheckEaseNEW-main/vue-login-backend/signup.php', {
+=======
+        const response = await axios.post('http://localhost/CheckEaseExp-NEW/vue-login-backend/signup.php', {
+>>>>>>> origin/main
           firstname: this.firstname,
           lastname: this.lastname,
           email: this.email,

@@ -217,6 +217,7 @@ import "flatpickr/dist/flatpickr.css";
 export default {
   data() {
     return {
+<<<<<<< HEAD
       students: [],
       allStudents: [],
       availableStudents: [],
@@ -229,6 +230,94 @@ export default {
       sortOrder: 'asc',
       isMobile: false
     };
+=======
+      students: [
+        { 
+          lastName: 'Doe', 
+          firstName: 'John', 
+          middleName: 'Albert', 
+          studentNumber: 'ST001', 
+          email: 'john.doe@example.com', 
+          status: 'PRESENT',
+          selected: false 
+        },
+        { 
+          lastName: 'Smith',  
+          firstName: 'Jane', 
+          middleName: 'Bonjing', 
+          studentNumber: 'ST002', 
+          email: 'jane.smith@example.com', 
+          status: 'PRESENT',
+          selected: false 
+        },
+        { 
+          lastName: 'Johnson', 
+          firstName: 'Mike', 
+          middleName: 'Cruz', 
+          studentNumber: 'ST003', 
+          email: 'mike.johnson@example.com', 
+          status: 'PRESENT',
+          selected: false 
+        },
+        { 
+          lastName: 'Williams', 
+          firstName: 'Sarah', 
+          middleName: 'Darara', 
+          studentNumber: 'ST004', 
+          email: 'sarah.williams@example.com', 
+          status: 'PRESENT',
+          selected: false 
+        }
+      ],
+      allStudents: [
+        { 
+          lastName: 'Doe', 
+          firstName: 'John', 
+          middleName: 'Albert', 
+          studentNumber: 'ST001', 
+          email: 'john.doe@example.com' 
+        },
+        { 
+          lastName: 'Smith', 
+          firstName: 'Jane', 
+          middleName: 'Bonjing', 
+          studentNumber: 'ST002', 
+          email: 'jane.smith@example.com' 
+        },
+        { 
+          lastName: 'Johnson', 
+          firstName: 'Mike', 
+          middleName: 'Cruz', 
+          studentNumber: 'ST003', 
+          email: 'mike.johnson@example.com' 
+        },
+        { 
+          lastName: 'Williams', 
+          firstName: 'Sarah', 
+          middleName: 'Darara', 
+          studentNumber: 'ST004', 
+          email: 'sarah.williams@example.com' 
+        },
+        { 
+          lastName: 'Brown', 
+          firstName: 'Emily', 
+          middleName: 'Esther', 
+          studentNumber: 'ST005', 
+          email: 'emily.brown@example.com' 
+        }
+      ],
+      showAddStudentDialog: false,
+      selectedStudent: null,
+      searchQuery: '',
+      sortKey: 'lastName',
+      sortOrder: 'asc',
+      selectedDate: null,
+      datePicker: null,
+      isMobile: false,
+      showDeleteDialog: false,
+      availableStudents: []
+    }
+>>>>>>> origin/main
   },
   computed: {
     filteredStudents() {
@@ -239,6 +328,7 @@ export default {
 
       // Apply sorting
       return filtered.sort((a, b) => {
+<<<<<<< HEAD
         const sortValueA = a[this.sortKey] || '';
         const sortValueB = b[this.sortKey] || '';
         if (this.sortOrder === 'asc') {
@@ -250,6 +340,68 @@ export default {
     }
   },
   methods: {
+=======
+        const aValue = a[this.sortKey]?.toLowerCase() ?? '';
+        const bValue = b[this.sortKey]?.toLowerCase() ?? '';
+        
+        if (this.sortOrder === 'asc') {
+          return aValue.localeCompare(bValue);
+        } else {
+          return bValue.localeCompare(aValue);
+        }
+      });
+    },
+    availableStudents() {
+      return this.allStudents.filter(student => 
+        !this.students.some(existing => 
+          existing.studentNumber === student.studentNumber
+        )
+      );
+    }
+  },
+  methods: {
+    addStudent() {
+      if (this.selectedStudent) {
+        const exists = this.students.some(
+          student => student.studentNumber === this.selectedStudent.studentNumber
+        );
+
+        if (exists) {
+          alert('This student is already in the list.');
+          return;
+        }
+
+        // Add new student with all properties including middleName
+        this.students.push({
+          lastName: this.selectedStudent.lastName,
+          firstName: this.selectedStudent.firstName,
+          middleName: this.selectedStudent.middleName,
+          studentNumber: this.selectedStudent.studentNumber,
+          email: this.selectedStudent.email,
+          status: 'PRESENT',
+          selected: false
+        });
+
+        this.closeAddStudentDialog();
+      }
+    },
+    deleteSelectedStudents() {
+      this.showDeleteDialog = true;
+    },
+    cancelDelete() {
+      this.showDeleteDialog = false;
+      this.students.forEach(student => student.selected = false);
+    },
+    confirmDelete() {
+      this.students = this.students.filter(student => !student.selected);
+      this.showDeleteDialog = false;
+    },
+    selectAll(event) {
+      this.students.forEach(student => {
+        student.selected = event.target.checked;
+      });
+    },
+>>>>>>> origin/main
     sort(key) {
       if (this.sortKey === key) {
         this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
@@ -258,6 +410,7 @@ export default {
         this.sortOrder = 'asc';
       }
     },
+<<<<<<< HEAD
     getSortIcon(key) {
       return this.sortKey === key ? (this.sortOrder === 'asc' ? 'bi bi-caret-down-fill' : 'bi bi-caret-up-fill') : '';
     },
@@ -280,10 +433,56 @@ export default {
         this.students.push(this.selectedStudent);
         this.selectedStudent = null;
         this.closeAddStudentDialog();
+=======
+    getSortIcon(column) {
+      if (this.sortKey !== column) return 'bi bi-arrow-down-up text-muted';
+      return this.sortOrder === 'asc' 
+        ? 'bi bi-arrow-down-short' 
+        : 'bi bi-arrow-up-short';
+    },
+    initDatePicker() {
+      this.datePicker = flatpickr(this.$refs.datePickerBtn, {
+        enableTime: false,
+        dateFormat: "Y-m-d",
+        onChange: (selectedDates) => {
+          if (selectedDates.length > 0) {
+            this.selectedDate = selectedDates[0];
+          }
+        },
+        onClose: () => {
+          // Trigger re-render of filtered students
+          this.$forceUpdate();
+        }
+      });
+    },
+    formatDate(date) {
+      if (!date) return '';
+      const options = { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      };
+      return new Date(date).toLocaleDateString('en-US', options);
+    },
+    checkScreenSize() {
+      this.isMobile = window.innerWidth < 768
+    },
+    getStatusClass(status) {
+      return {
+        'status-present': status === 'PRESENT',
+        'status-absent': status === 'ABSENT',
+        'status-late': status === 'LATE'
+      }
+    },
+    handleStatusChange(student) {
+      if (window.navigator.vibrate) {
+        window.navigator.vibrate(50)
+>>>>>>> origin/main
       }
     },
     closeAddStudentDialog() {
       this.showAddStudentDialog = false;
+<<<<<<< HEAD
     },
     deleteSelectedStudents() {
       this.showDeleteDialog = true;
@@ -309,6 +508,48 @@ export default {
 </style>
 
 <style scoped>
+=======
+      this.selectedStudent = null;
+    }
+  },
+  mounted() {
+    this.initDatePicker();
+    // Initialize mobile date picker
+    if (this.$refs.mobileDatePicker) {
+      this.mobileDatePicker = flatpickr(this.$refs.mobileDatePicker, {
+        enableTime: false,
+        dateFormat: "Y-m-d",
+        static: true,
+        allowInput: false,
+        clickOpens: true,
+        onChange: (selectedDates) => {
+          if (selectedDates.length > 0) {
+            this.selectedDate = selectedDates[0];
+            this.$forceUpdate(); // Force update to refresh view
+          }
+        },
+        onClose: () => {
+          // Update filtered students when date is selected
+          this.$forceUpdate();
+        }
+      });
+    }
+  },
+  beforeDestroy() {
+    // Clean up flatpickr instance
+    if (this.datePicker) {
+      this.datePicker.destroy();
+    }
+    // Clean up flatpickr instance
+    if (this.mobileDatePicker) {
+      this.mobileDatePicker.destroy();
+    }
+  }
+}
+</script>
+
+<style scoped>
+>>>>>>> origin/main
 .table-container {
   width: 100%;
   max-width: 1250px;

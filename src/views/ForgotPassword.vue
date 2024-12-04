@@ -140,7 +140,11 @@ export default {
       // Perform the API request
       try {
         const response = await axios.post(
+<<<<<<< HEAD
           "http://localhost/CheckEaseNEW-main/vue-login-backend/forgotPassword.php",
+=======
+          "http://localhost/CheckEaseExp-NEW/vue-login-backend/forgotPassword.php",
+>>>>>>> origin/main
           {
             email: this.email,
             newPassword: this.newPassword,

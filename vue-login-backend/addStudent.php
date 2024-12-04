@@ -30,3 +30,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+<<<<<<< HEAD
+=======
+
+// api/fetch_classes.php
+<?php
+header('Content-Type: application/json');
+require '../db.php';
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+    exit;
+}
+
+$admin_id = $_SESSION['user_id'];
+
+try {
+    $stmt = $pdo->prepare("SELECT * FROM classes WHERE created_by = ?");
+    $stmt->execute([$admin_id]);
+    $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode(['success' => true, 'classes' => $classes]);
+} catch (PDOException $e) {
+    echo json_encode(['success' => false, 'message' => 'Error fetching classes']);
+}
+?>
+>>>>>>> origin/main
