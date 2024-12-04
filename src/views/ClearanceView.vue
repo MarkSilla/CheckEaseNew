@@ -1,80 +1,80 @@
 <template>
-    <div class="container position-flex offset-md-2" style="margin-top: 100px">
-      <div class="row">
+  <div class="container position-flex offset-md-2" style="margin-top: 100px">
+    <div class="row">
+      <div
+        class="col-12 col-sm-6 col-md-5 col-lg-4 mb-2"
+        v-for="(card, index) in cards"
+        :key="index"
+      >
         <div
-          class="col-12 col-sm-6 col-md-5 col-lg-4 mb-2 "
-          v-for="(card, index) in cards"
-          :key="index"
+          class="card custom-card shadow-sm d-flex flex-column align-items-center justify-content-center"
+          style="width: 340px; height: 200px;"
         >
-          <div class="card custom-card shadow-sm d-flex flex-column align-items-center justify-content-center" style="width: 340px; height: 200px;">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center">
-              <div class="card-content text-center mb-3">
-                <h5 class="card-title"><b>{{ card.title }}</b></h5>
-                <p class="card-text" v-html="card.text"></p>
-              </div>
-              <router-link 
-                :to="card.button.link" 
-                class="btn custom-btn"
-              >
-                <u>{{ card.button.text }}</u>
-              </router-link>
+          <div class="card-body d-flex flex-column align-items-center justify-content-center">
+            <div class="card-content text-center mb-3">
+              <h5 class="card-title"><b>{{ card.title }}</b></h5>
+              <p class="card-text" v-html="card.text"></p>
             </div>
+            <router-link
+              :to="{ path: '/clearancerecord' }"
+              class="btn custom-btn"
+            ><u>Take Clearance</u> </router-link>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "ClearanceView",
-    data() {
-      return {
-        cards: [
-          {
-            title: "BSIT-2A",
-            button: { text: "Clearance Record", link: "/ClearanceRecord" },
-          },
-          {
-            title: "BSIT-2B",
-            button: { text: "Clearance Record", link: "/ClearanceRecord" },
-          },
-          {
-            title: "BSIT-2C",
-            button: { text: "Clearance Record", link: "/ClearanceRecord" },
-          },
-          {
-            title: "BSIT-2D",
-            button: { text: "Clearance Record", link: "/ClearanceRecord" },
-          },
-          {
-            title: "BSIT-2D",
-            button: { text: "Clearance Record", link: "/ClearanceRecord" },
-          },
-          {
-            title: "BSIT-2D",
-            button: { text: "Clearance Record", link: "/ClearanceRecord" },
-          },
-          {
-            title: "BSIT-2D",
-            button: { text: "Clearance Record", link: "/ClearanceRecord" },
-          },
-          {
-            title: "BSIT-2D",
-            button: { text: "Clearance Record", link: "/ClearanceRecord" },
-          },
-          {
-            title: "BSIT-2D",
-            button: { text: "Clearance Record", link: "/ClearanceRecord" },
-          },
- 
-        ],
-      };
-    },
-  };
-  </script>
-  
-  <style scoped>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "ClearanceView",
+  data() {
+    return {
+      cards: [
+        {
+          title: "BSIT-2A",
+          text: "Some text for BSIT-2A",
+        },
+        {
+          title: "BSIT-2B",
+          text: "Some text for BSIT-2B",
+        },
+        {
+          title: "BSIT-2C",
+          text: "Some text for BSIT-2C",
+        },
+        {
+          title: "BSIT-2D",
+          text: "Some text for BSIT-2D",
+        },
+        {
+          title: "BSIT-2D",
+          text: "Some text for BSIT-2D",
+        },
+        {
+          title: "BSIT-2D",
+          text: "Some text for BSIT-2D",
+        },
+        {
+          title: "BSIT-2D",
+          text: "Some text for BSIT-2D",
+        },
+        {
+          title: "BSIT-2D",
+          text: "Some text for BSIT-2D",
+        },
+        {
+          title: "BSIT-2D",
+          text: "Some text for BSIT-2D",
+        },
+      ],
+    };
+  },
+};
+</script>
+
+<style scoped>
 .card {
   border-radius: 15px;
   margin-left: 45px;
@@ -83,7 +83,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  background-color: #96D4DE;
+  background-color: #96d4de;
   height: 200px;
   position: relative;
 }
@@ -97,11 +97,12 @@
 }
 
 .card:hover .custom-btn {
-  background-color: #96D4DE; 
-  color: black; 
+  background-color: #96d4de;
+  color: black;
 }
+
 .card-title {
-  font-size: 24px;  
+  font-size: 24px;
 }
 
 .card:before {
@@ -125,7 +126,6 @@
 
 .custom-btn {
   width: 150%;
-  
   max-width: 200px;
   background-color: #00838d;
   color: #fff;
@@ -136,16 +136,14 @@
   font-size: 16px;
   transition: background-color 0.2s ease-in-out;
 }
-@media (max-width: 576px) {
+
+@media (max-width: 768px) {
   .container {
     margin-top: 100px;
-    margin-bottom: 50px;
+    margin-bottom: 90px;
   }
   .card {
     margin-left: 30px;
   }
 }
-
-
-  </style>
-  
+</style>

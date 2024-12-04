@@ -1,108 +1,122 @@
 <template>
-    <div class="container position-flex offset-md-2" style="margin-top: px">
-      <div class="row">
+  <div class="container position-flex offset-md-2" style="margin-top: 20px">
+    <!-- Check if classes are loaded -->
+    <div v-if="classes.length > 0" class="row">
+      <div
+        class="col-12 col-sm-6 col-md-5 col-lg-4 mb-2"
+        v-for="(classItem, index) in classes"
+        :key="index"
+      >
         <div
-          class="col-12 col-sm-6 col-md-5 col-lg-4 mb-2"
-          v-for="(card, index) in cards"
-          :key="index"
+          class="card custom-card shadow-sm d-flex flex-column align-items-center justify-content-center"
+          style="width: 340px; height: 200px;"
         >
-          <div class="card custom-card shadow-sm d-flex flex-column align-items-center justify-content-center" style="width: 340px; height: 200px;">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center">
-              <div class="card-content text-center mb-3">
-                <h5 class="card-title"><b>{{ card.title }}</b></h5>
-                <p class="card-text" v-html="card.text"></p>
-              </div>
-              <router-link
-                :to="{ path: '/ViewStudentAttendance' }"
-                class="btn custom-btn"
-              > <u>View Attendance</u> </router-link>
-              <router-link
-                :to="{ path: '/attendancerecord' }"
-                class="btn custom-btn"
-              ><u>Take Attendance</u> </router-link>
+          <div class="card-body d-flex flex-column align-items-center justify-content-center">
+            <div class="card-content text-center mb-3">
+              <!-- Custom Display Format -->
+              <strong class="classSection">{{ classItem.section }}</strong><br>
+              <p class="card-text"><strong>Class Name: </strong>{{ classItem.class_name }}</p>
+              <p class="card-text"><strong>Class Code: </strong>{{ classItem.class_code }}</p>
             </div>
+            <!-- View Attendance and Take Attendance Buttons -->
+            <router-link
+              :to="{ path: '/ViewStudentAttendance', query: { classCode: classItem.class_code } }"
+              class="btn custom-btn"
+            >
+              <u>View Attendance</u>
+            </router-link>
+            <router-link
+              :to="{ path: '/attendancerecord', query: { classCode: classItem.class_code } }"
+              class="btn custom-btn"
+            >
+              <u>Take Attendance</u>
+            </router-link>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "AttendanceRecord",
-    data() {
-      return {
-        cards: [
-          {
-            title: "BSIT-2A",
-            button: { text: "View Attendance", link: "/attendance" }, // Updated link
-          },
-          {
-            title: "BSIT-2B",
-            button: { text: "View Attendance", link: "/attendance" },
-          },
-          {
-            title: "BSIT-2C",
-            button: { text: "View Attendance", link: "/attendance" },
-          },
-          {
-            title: "BSIT-2D",
-            button: { text: "View Attendance", link: "/attendance" },
-          },
-          {
-            title: "BSIT-2E",
-            button: { text: "View Attendance", link: "/attendance" },
-          },
-          {
-            title: "BSIT-2F",
-            button: { text: "View Attendance", link: "/attendance" },
-          }
-        ],
-      };
-    },
-    methods: {
-      handleResize() {
-        const width = window.innerWidth;
-        const container = document.querySelector('.container');
-        const cards = document.querySelectorAll('.custom-card');
-  
-        if (width <= 576) { // Mobile
-          container.style.padding = '10px';
-          cards.forEach(card => {
-            card.style.width = '85%';
-            card.style.height = '150px';
-            card.style.margin = '10px auto';
-          });
-        } else if (width <= 768) { // Tablet
-          container.style.padding = '15px';
-          cards.forEach(card => {
-            card.style.width = '90%';
-            card.style.height = '180px';
-            card.style.margin = '12px auto';
-          });
-        } else { // Desktop
-          container.style.padding = '20px';
-          cards.forEach(card => {
-            card.style.width = '340px';
-            card.style.height = '200px';
-            card.style.margin = '15px';
-          });
-        }
+
+    <!-- If no classes are found in localStorage -->
+    <div v-else class="text-center">
+      <p class="lead">It looks like you haven't created any classes yet.</p>
+      <p>Please visit the <router-link to="/class" class="text-primary"><strong>Create Class</strong></router-link> page to add your first class.</p>
+    </div>
+  </div>
+</template>
+
+
+<script>
+export default {
+  name: "AttendanceRecord",
+  data() {
+    return {
+      classes: [], 
+    };
+  },
+  methods: {
+    loadClassesFromLocalStorage() {
+      const storedClasses = localStorage.getItem('classes');
+      if (storedClasses) {
+        this.classes = JSON.parse(storedClasses);
+        console.log('Loaded classes from localStorage:', this.classes);
+      } else {
+        console.log("No classes found.");
       }
     },
+
+    handleResize() {
+      const width = window.innerWidth;
+      const container = document.querySelector('.container');
+      const cards = document.querySelectorAll('.custom-card');
   
-    mounted() {
-      this.handleResize();
-      window.addEventListener('resize', this.handleResize);
-    },
-  
-    beforeDestroy() {
-      window.removeEventListener('resize', this.handleResize);
+      if (width <= 576) { 
+        container.style.padding = '10px';
+        cards.forEach(card => {
+          card.style.width = '85%';
+          card.style.height = '150px';
+          card.style.margin = '10px auto';
+        });
+      } else if (width <= 768) { 
+        container.style.padding = '15px';
+        cards.forEach(card => {
+          card.style.width = '90%';
+          card.style.height = '180px';
+          card.style.margin = '12px auto';
+        });
+      } else { 
+        container.style.padding = '20px';
+        cards.forEach(card => {
+          card.style.width = '340px';
+          card.style.height = '200px';
+          card.style.margin = '15px';
+        });
+      }
     }
-  };
-  </script>
-  
-  <style scoped>
+  },
+  watch: {
+    '$route'(to, from) {
+      this.loadClassesFromLocalStorage();
+    }
+  },
+  mounted() {
+    this.loadClassesFromLocalStorage(); 
+    this.handleResize();
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
+  }
+};
+</script>
+
+
+
+
+<style scoped>
+.classSection {
+  font-size: 2.5rem; /* Adjust this value as needed */
+  font-weight: bold;
+}
   .custom-btn {
     margin-top: 5px;
   }

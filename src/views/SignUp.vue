@@ -30,7 +30,7 @@
             <h1 class="text-center mt-4"><b>Sign up</b></h1>
             <p class="text-center text-secondary">
               Already have an account?
-              <router-link to="/login" class="text-decoration-none">Log in!</router-link>
+              <router-link to="/login" class="text-decoration-none">Log in</router-link>
             </p>
 
             <form @submit.prevent="submitForm" class="px-3 py-2">
@@ -60,6 +60,7 @@
               <div class="mb-2">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" id="password" v-model="password" class="form-control" />
+                <div v-if="passwordError" class="text-danger">{{ passwordError }}</div> <!-- Show password error -->
               </div>
 
               <div class="mb-2 text-start">
@@ -87,8 +88,9 @@
   </div>
 </template>
 
+
 <script>
-import axios from 'axios'; 
+import axios from 'axios';
 
 export default {
   name: 'SignUp',
@@ -100,12 +102,13 @@ export default {
       password: '',
       confirmPassword: '',
       role: '',
-      passwordMismatch: false, 
+      passwordMismatch: false,
       firstnameError: '',
       lastnameError: '',
-      nameError: '', 
+      nameError: '',
       roleError: '',
-      emailError:'',
+      emailError: '',
+      passwordError: '', // To store password error messages
       showInfoSection: true,
     };
   },
@@ -117,46 +120,54 @@ export default {
     window.removeEventListener('resize', this.checkScreenSize);
   },
   methods: {
-    // Check if screen size is larger than 768px for displaying info section
     checkScreenSize() {
       this.showInfoSection = window.innerWidth >= 768;
     },
 
-    // Validate the form before submission
     validateForm() {
-      const nameRegex = /^[A-Za-z\s]+$/;  
-      this.nameError = ''; 
+      const nameRegex = /^[A-Za-z\s]+$/;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/; // Password validation
 
-      // First and Last name validation
+      this.nameError = '';
+      this.emailError = '';
+      this.passwordError = ''; // Reset password error
+
+      // Validate that all fields are filled
       if (!this.firstname || !this.lastname || !this.email || !this.password || !this.confirmPassword || !this.role) {
-        alert('Please fill in all fields.');
+        this.emailError = 'Please fill in all fields.';
         return false;
       }
 
-      // Name format validation (letters and spaces only)
+      // Validate that names only contain letters
       if (!nameRegex.test(this.firstname) || !nameRegex.test(this.lastname)) {
-        this.nameError = 'First and last name can only contain letters and spaces.';
+        this.nameError = 'First and last name can only contain letters.';
         return false;
       }
 
-      // Password mismatch check
+      // Validate that passwords match
       if (this.password !== this.confirmPassword) {
         this.passwordMismatch = true;
-        alert('Passwords do not match.');
+        this.passwordError = 'Passwords do not match.';
         return false;
       }
 
+      // Validate password complexity (length, lowercase, uppercase, and digits)
+      if (!passwordRegex.test(this.password)) {
+        this.passwordError = 'Password must be at least 8 characters long, contain at least one lowercase letter, one uppercase letter, and one number.';
+        return false;
+      }
+
+      this.passwordMismatch = false; // Reset password mismatch error
       return true;
     },
 
-    // Submit the form data
     async submitForm() {
       if (!this.validateForm()) {
         return;
       }
 
       try {
-        const response = await axios.post('http://localhost/CheckEaseNew-main/vue-login-backend/signup.php', {
+        const response = await axios.post('http://localhost/CheckEaseNEW-main/vue-login-backend/signup.php', {
           firstname: this.firstname,
           lastname: this.lastname,
           email: this.email,
@@ -164,28 +175,29 @@ export default {
           role: this.role,
         });
 
-        console.log(response.data);
-
         const result = response.data;
 
         if (result.success) {
-        
+          // On success, store data and navigate to login
           localStorage.setItem('token', result.token);
           localStorage.setItem('firstname', result.firstname);
           localStorage.setItem('lastname', result.lastname);
-          localStorage.setItem('email', result.email);  
+          localStorage.setItem('email', result.email);
 
           this.$router.push('/login');
         } else {
-          alert(result.message); 
+          if (result.message && result.message.includes('email is already registered.')) {
+            this.emailError = 'Email is already registered. Please use a different email.';
+          } else {
+            this.emailError = result.message;
+          }
         }
       } catch (error) {
-        alert(`Error: ${error.message}`);
+        this.emailError = `Error: ${error.message}`;
       }
-    }
+    },
   },
   watch: {
-    
     password(newVal) {
       this.passwordMismatch = this.password !== this.confirmPassword;
     },
@@ -195,6 +207,8 @@ export default {
   },
 };
 </script>
+
+
 
 <style scoped>
 body {

@@ -1,17 +1,20 @@
 <?php
 require __DIR__ . '/vendor/autoload.php'; 
-
-header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-
+include 'Cors.php';
 use Firebase\JWT\JWT;
 include 'db.php';
+
+session_start(); 
 
 $secret_key = getenv('JWT_SECRET_KEY'); 
 if (!$secret_key) {
     echo json_encode(['success' => false, 'message' => 'Missing JWT secret key.']);
+    exit;
+}
+
+// Check if the user is already authenticated
+if (isset($_SESSION['jwt'])) {
+    echo json_encode(['success' => true, 'message' => 'User already logged in.', 'token' => $_SESSION['jwt']]);
     exit;
 }
 
@@ -31,15 +34,14 @@ try {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
-       
         if (password_verify($password, $user['password'])) {
             $payload = [
-                "iss" => "http://localhost/CheckEaseExp-NEW/vue-login-backend/login.php",
-                "aud" => "http://localhost/CheckEaseExp-NEW/vue-login-backend/login.php",
+                "iss" => "http://localhost/CheckEaseExp-NEW/vue-login-backend/login.php", 
+                "aud" => "http://localhost/CheckEaseExp-NEW/vue-login-backend/login.php", 
                 "iat" => time(),
-                "exp" => time() + (60 * 60), 
+                "exp" => time() + (60 * 60 * 24),  
                 "data" => [
-                    "id" => $user['id'],
+                    "id" => $user['id'], 
                     "firstname" => $user['firstname'],
                     "lastname" => $user['lastname'],
                     "email" => $user['email'],
@@ -48,6 +50,7 @@ try {
             ];
 
             $jwt = JWT::encode($payload, $secret_key, 'HS256');
+            $_SESSION['jwt'] = $jwt;
             $updateStmt = $pdo->prepare("UPDATE users SET token = :token WHERE email = :email");
             $updateResult = $updateStmt->execute(['token' => $jwt, 'email' => $email]);
 

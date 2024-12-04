@@ -1,10 +1,10 @@
 <template>
   <div id="app" class="d-flex">
-    <AdminSidebar v-if="isHomeView || isClearanceView || isAttendanceView || isCreateClass || isViewStdntAttendance || isClearanceRecord" />
+    <AdminSidebar v-if="isHomeView || isClearanceView || isAttendanceView || isCreateClass || isViewStdntAttendance || isClearanceRecord|| isAttendanceRecord" />
     <Sidebar v-else-if="!isAuthPage" />
     
     <div class="main-content flex-grow-3">
-      <AdminHeader v-if="isHomeView || isClearanceView || isAttendanceView || isCreateClass || isViewStdntAttendance || isClearanceRecord" />
+      <AdminHeader v-if="isHomeView || isClearanceView || isAttendanceView || isCreateClass || isViewStdntAttendance || isClearanceRecord || isAttendanceRecord" />
       <Header v-else-if="!isAuthPage" />
       
       <div class="container-fluid">
@@ -50,7 +50,10 @@ export default {
     },
     isClearanceRecord() {
       return this.$route.name === 'ClearanceRecord';
-    }
+    },
+    isAttendanceRecord() {
+      return this.$route.name === 'AttendanceRecord';
+    },
   }
 };
 </script>

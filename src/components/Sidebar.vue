@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Burger Icon for Phone Screens -->
     <div 
       v-if="isPhoneView" 
       class="burger-menu-icon position-fixed"
@@ -8,12 +7,10 @@
       <i class="material-icons">menu</i>
     </div>
 
-    <!-- Sidebar -->
     <div 
       class="sidebar d-flex flex-column align-items-center py-4" 
       :class="{ 'hidden': isPhoneView && isCollapsed }" 
       id="sidebar">
-      <!-- Logo (hidden in phone view when collapsed) -->
       <img 
         v-if="!isCollapsed || !isPhoneView" 
         src="/public/images/logo.png" 
@@ -37,7 +34,6 @@
       </div>
     </div>
 
-    <!-- Custom Logout Confirmation Dialog -->
     <div v-if="showDialog" class="dialog-overlay">
       <div class="dialog">
         <h2>Do you want to Logout?</h2>
@@ -52,6 +48,8 @@
 </template>
 
 <script>
+import axios from 'axios'; 
+
 export default {
   name: "Sidebar",
   data() {
@@ -66,21 +64,23 @@ export default {
       this.isCollapsed = !this.isCollapsed; 
     },
     confirmLogout() {
-
       this.showDialog = true;
     },
     closeDialog() {
-     
       this.showDialog = false;
     },
     logout() {
-   
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      localStorage.removeItem("userFullName");  
-
-      this.$router.push({ name: 'Login' });
-      this.showDialog = false;
+      axios.get('/logout.php') 
+        .then(response => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          localStorage.removeItem("userFullName");
+          this.$router.push({ name: 'Login' });
+          this.showDialog = false;
+        })
+        .catch(error => {
+          console.error('Logout failed:', error);
+        });
     },
     updateView() {
       this.isPhoneView = window.innerWidth <= 768;
@@ -141,7 +141,7 @@ export default {
   border: none;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color 0.3s, transform 0.2s ease; /* Smooth transition for hover */
+  transition: background-color 0.3s, transform 0.2s ease; 
 }
 
 .dialog-confirm {
@@ -166,7 +166,7 @@ export default {
   background-color: #0056b3; 
   transform: scale(1.1); 
 }
-/* Sidebar Styles */
+
 #sidebar {
   width: 60px;
   background-color: #DBF4F8 !important;
@@ -177,12 +177,12 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
   z-index: 1000;
   transition: transform 0.3s ease, opacity 0.3s ease;
-  overflow: hidden; /* Prevent content overflow */
+  overflow: hidden; 
 }
 
 #sidebar.hidden {
-  transform: translateX(-100%); /* Move sidebar out of view */
-  opacity: 0; /* Ensure it's visually hidden */
+  transform: translateX(-100%); 
+  opacity: 0;
 }
 
 .logo {
@@ -231,7 +231,6 @@ export default {
   font-size: 30px;
 }
 
-/* Responsive Adjustments */
 @media (max-width: 576px) {
   #sidebar {
     width: 60px;

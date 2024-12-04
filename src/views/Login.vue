@@ -16,7 +16,7 @@
           <h2 class="text-center"><b>Log in to your Account</b></h2>
           <p class="text-secondary text-center mb-4">
             New to Check Ease?
-            <router-link to="/signup" class="text-decoration-none">Sign up!</router-link>
+            <router-link to="/signup" class="text-decoration-none">Sign up</router-link>
           </p>
 
           <!-- Email Input -->
@@ -33,8 +33,8 @@
 
           <!-- Forgot Password Link -->
           <div class="text-end mb-4">
-            <a href="#" class="text-decoration-none">Forgot password?</a>
-          </div>
+            <router-link to="/forgotPassword" class="text-decoration-none">Forgot password?</router-link>
+        </div>
 
           <!-- Submit Button -->
           <button type="submit" class="btn btn-primary w-100">LOG IN</button>
@@ -67,8 +67,8 @@ export default {
   methods: {
     async submitForm() {
       try {
-        // Send login request to the backend
-        const response = await axios.post('http://localhost/CheckEaseNew-main/vue-login-backend/login.php', {
+      
+        const response = await axios.post('http://localhost/CheckEaseNEW-main/vue-login-backend/login.php', {
           email: this.email,
           password: this.password,
         });
@@ -81,12 +81,13 @@ export default {
           localStorage.setItem('firstname', result.firstname);
           localStorage.setItem('lastname', result.lastname);
           localStorage.setItem('email', result.email);
+          
           const fullName = `${result.firstname} ${result.lastname}`;
           localStorage.setItem('userFullName', fullName);
+
           const decodedToken = this.decodeJWT(result.token);
 
           if (decodedToken && decodedToken.exp > Math.floor(Date.now() / 1000)) {
-  
             localStorage.setItem('userId', decodedToken.data.id);
             localStorage.setItem('userFirstName', decodedToken.data.firstname);
             localStorage.setItem('userLastName', decodedToken.data.lastname);
@@ -97,11 +98,10 @@ export default {
               this.$router.push({ name: 'Home' });
             } else if (decodedToken.data.role === 'student') {
               this.$router.push({ name: 'StudentHome' });
-            } else {
-              console.warn('No role or redirect path specified in response.');
             }
           } else {
             this.errorMessage = 'Your session has expired. Please log in again.';
+            this.logout(); 
           }
         } else {
           this.errorMessage =
@@ -112,7 +112,6 @@ export default {
         this.errorMessage = 'Something went wrong, please try again.';
       }
     },
-
     decodeJWT(token) {
       try {
         const base64Url = token.split('.')[1];
@@ -124,10 +123,43 @@ export default {
         return null;
       }
     },
+    logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      localStorage.removeItem('firstname');
+      localStorage.removeItem('lastname');
+      localStorage.removeItem('email');
+      localStorage.removeItem('userFullName');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userFirstName');
+      localStorage.removeItem('userLastName');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userRole');
+      this.$router.push({ name: 'Login' });
+    }
+  },
+
+  mounted() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = this.decodeJWT(token);
+      if (decodedToken && decodedToken.exp > Math.floor(Date.now() / 1000)) {
+        this.user = decodedToken.data;
+
+        if (this.user.role === 'teacher') {
+          this.$router.push({ name: 'Home' });
+        } else if (this.user.role === 'student') {
+          this.$router.push({ name: 'StudentHome' });
+        }
+      } else {
+        this.logout();
+      }
+    } else {
+      this.$router.push({ name: 'Login' });
+    }
   },
 };
 </script>
-
 
 
 <style scoped>

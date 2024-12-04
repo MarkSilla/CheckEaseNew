@@ -1,17 +1,11 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
-
-header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include 'db.php';
-use Firebase\JWT\JWT;
-$secret_key = getenv('JWT_SECRET_KEY'); 
+include 'Cors.php';
+include 'db.php'; 
+include 'validate.php'; 
 
 session_start();
 
@@ -32,19 +26,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $jwt = $matches[1];
+    $jwt = $matches[1]; 
 
-    try {
-        // Fix: Pass the algorithm as a value, not by reference
-        $decoded = JWT::decode($jwt, $secret_key, ['HS256']); // Use $secret_key here
-        $userId = $decoded->user_id;
-    } catch (Exception $e) {
-        echo json_encode(['success' => false, 'error' => 'Invalid or expired token: ' . $e->getMessage()]);
+    // Validate the JWT
+    $userId = validateJWT($jwt);
+
+    if (!$userId) {
+        echo json_encode(['success' => false, 'error' => 'Invalid or expired token']);
         exit;
     }
-    
-    // Parse JSON input
+
+    // Get and log the received data for debugging
     $postData = json_decode(file_get_contents('php://input'), true);
+    error_log('Received data: ' . print_r($postData, true));
+
     if (empty($postData)) {
         echo json_encode(['success' => false, 'error' => 'Invalid input data']);
         exit;
@@ -52,32 +47,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $className = trim($postData['class_name'] ?? '');
     $capacity = trim($postData['capacity'] ?? '');
+    $section = trim($postData['section'] ?? '');
 
-    // Validate input
-    if (empty($className) || !is_numeric($capacity) || $capacity <= 0) {
-        echo json_encode(['success' => false, 'error' => 'Invalid class name or capacity']);
+    error_log("Class Name: $className");
+    error_log("Capacity: $capacity");
+    error_log("Section: $section");
+
+    error_log("Class: $className, Capacity: $capacity, Section: $section"); 
+
+    if (empty($className) || !is_numeric($capacity) || $capacity <= 0 || empty($section)) {
+        echo json_encode(['success' => false, 'error' => 'Invalid class name, capacity, or section']);
         exit;
     }
 
     $classCode = strtoupper(substr(md5(uniqid(rand(), true)), 0, 6));
 
     try {
-        // Prepare and execute the query
-        $query = "INSERT INTO classes (class_name, capacity, class_code, created_by, created_at) 
-                  VALUES (:class_name, :capacity, :class_code, :created_by, NOW())";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':class_name', $className, PDO::PARAM_STR);
-        $stmt->bindParam(':capacity', $capacity, PDO::PARAM_INT);
-        $stmt->bindParam(':class_code', $classCode, PDO::PARAM_STR);
-        $stmt->bindParam(':created_by', $userId, PDO::PARAM_INT);
+        $stmt = $pdo->prepare("INSERT INTO classes (class_name, capacity, created_by, class_code, section) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$className, $capacity, $userId, $classCode, $section]);
 
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'class_code' => $classCode]);
+        if ($stmt->rowCount() > 0) {
+            
+            echo json_encode([
+                'success' => true,
+                'class' => [
+                    'class_name' => $className,
+                    'capacity' => $capacity,
+                    'class_code' => $classCode,
+                    'section' => $section
+                ]
+            ]);
         } else {
-            echo json_encode(['success' => false, 'error' => 'Failed to execute query']);
+            echo json_encode(['success' => false, 'error' => 'Failed to insert class into the database']);
         }
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+        error_log('Database error: ' . $e->getMessage()); // Log the error details
     }
 } else {
     echo json_encode(['success' => false, 'error' => 'Invalid request method']);
