@@ -265,8 +265,7 @@ export default {
       lastName: "",
     };
   },
-  computed: {
-    filteredStudents() {
+  computed: {filteredStudents() {
       return this.students.filter(student => {
         // Search by email field (you can add other fields like firstName, lastName as needed)
         const searchString = `${student.firstName} ${student.lastName} ${student.email}`.toLowerCase();
